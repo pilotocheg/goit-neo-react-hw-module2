@@ -1,8 +1,9 @@
 import { useEffect, useState } from "react";
+
 import Description from "./Description";
 import Options from "./Options";
 import Feedback from "./Feedback";
-
+import Notification from "./Notification";
 import css from "./App.module.css";
 
 const STORAGE_KEY = "feedbackData";
@@ -34,11 +35,32 @@ export default function App() {
     setFeedback(defaultFeedback);
   };
 
+  const { good, neutral, bad } = feedback;
+  const total = good + neutral + bad;
+  const hasSomeFeedback = total > 0;
+  const positivePercentage = hasSomeFeedback
+    ? Math.round((good / total) * 100)
+    : 0;
+
   return (
     <div className={css.app}>
       <Description />
-      <Options onOptionSelect={updateFeedback} onReset={resetFeedback} />
-      <Feedback feedback={feedback} />
+      <Options
+        onOptionSelect={updateFeedback}
+        onReset={resetFeedback}
+        resetShown={hasSomeFeedback}
+      />
+      {hasSomeFeedback ? (
+        <Feedback
+          good={good}
+          neutral={neutral}
+          bad={bad}
+          total={total}
+          positivePercentage={positivePercentage}
+        />
+      ) : (
+        <Notification />
+      )}
     </div>
   );
 }
